@@ -1,19 +1,22 @@
+const fs = require('fs/promises');
+const path = require('path');
+require('dotenv').config();
+const { mkdirp } = require('mkdirp');
+
 const Superheros = require('../repository/superheros_methods');
 const { HttpCode } = require('../config/constants');
 const { CustomError } = require('../helpers/custom_error');
-const fs = require('fs/promises');
-const path = require('path');
-const { mkdirp } = require('mkdirp');
 const UploadService = require('../service/file-upload');
-require('dotenv').config();
 const { removeSuperheroDir } = require('../service/file-delete');
 const { removeOneImageSuperhero } = require('../service/one_image-delete');
 
+// Get all superheros
 const getSuperheros = async (req, res) => {
   const data = await Superheros.listSuperheros(req.query);
   res.json({ status: 'success', code: HttpCode.OK, data: { ...data } });
 };
 
+// Get superheros by id
 const getSuperhero = async (req, res, next) => {
   const superhero = await Superheros.getSuperheroById(req.params.id);
   if (superhero) {
@@ -25,6 +28,7 @@ const getSuperhero = async (req, res, next) => {
   throw new CustomError(HttpCode.NOT_FOUND, 'Not found');
 };
 
+// Create superhero
 const createSuperhero = async (req, res, next) => {
   if (!req.file) {
     return res.status(HttpCode.BAD_REQUEST).json({
@@ -57,6 +61,7 @@ const createSuperhero = async (req, res, next) => {
   });
 };
 
+// Delete superhero
 const removeSuperhero = async (req, res, next) => {
   const superhero = await Superheros.removeSuperhero(req.params.id);
   if (superhero) {
@@ -69,6 +74,7 @@ const removeSuperhero = async (req, res, next) => {
   throw new CustomError(HttpCode.NOT_FOUND, 'Not found');
 };
 
+// Update superhero
 const updateSuperhero = async (req, res, next) => {
   const superhero = await Superheros.updateSuperhero(req.params.id, req.body);
 
@@ -141,8 +147,6 @@ const uploadImages = async (req, res, next) => {
 const removeImageSuperhero = async (req, res) => {
   const { image } = req.body;
   const id = req.params.id;
-  // console.log(image);
-  // console.log(req.params.id);
 
   const superhero = await Superheros.getSuperheroById(id);
 

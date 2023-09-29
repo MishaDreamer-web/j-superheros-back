@@ -6,22 +6,20 @@ const {
   createSuperhero,
   removeSuperhero,
   updateSuperhero,
-  updateSuperheroImage,
   removeImageSuperhero,
   uploadImages,
 } = require('../../controllers/superheros_controllers');
-const {
-  validateSuperhero,
-  validateImagesSuperhero,
-  validateId,
-} = require('./validation');
+const { validateSuperhero, validateId } = require('./validation');
 const wrapError = require('../../helpers/error_handler');
 const upload = require('../../helpers/uploads');
 
+// Get all superheros
 router.get('/', wrapError(getSuperheros));
 
+// Get superheros by id
 router.get('/:id', validateId, wrapError(getSuperhero));
 
+// Create superhero
 router.post(
   '/',
   upload.single('images'),
@@ -29,29 +27,26 @@ router.post(
   wrapError(createSuperhero),
 );
 
+// Delete superhero
 router.delete('/:id', validateId, wrapError(removeSuperhero));
 
+// Remove superhero image
 router.delete('/:id/images/', validateId, wrapError(removeImageSuperhero));
 
+// Update superhero
 router.put(
   '/:id',
   upload.single('images'),
-  [(validateId, validateSuperhero)],
+  validateId,
   wrapError(updateSuperhero),
 );
 
+// Adding superhero image
 router.patch(
   '/:id/images/',
   validateId,
   upload.single('images'),
   wrapError(uploadImages),
 );
-
-// router.patch(
-//   '/:id/images/',
-//   upload.single('images'),
-//   [validateId, validateImagesSuperhero],
-//   wrapError(uploadImages),
-// );
 
 module.exports = router;
